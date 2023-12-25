@@ -29,6 +29,7 @@ export default {
       apiSetting: 'Backend Setting',
       aboutUs: 'About Sub-Store',
       notFound: '404 Not Found',
+      login: 'Login',
       askWhat: {
         sync: {
           title: 'What is Sync Subscription?',

@@ -5,7 +5,11 @@
       <div class="sticky-title-wrapper">
         <p>{{ $t(`editorPage.subConfig.basic.label`) }}</p>
       </div>
-      <nut-form class="form" :model-value="form" ref="ruleForm">
+      <nut-form
+        class="form"
+        :model-value="form"
+        ref="ruleForm"
+      >
         <!-- name -->
         <nut-form-item
           required
@@ -65,12 +69,19 @@
             prop="source"
           >
             <div class="radio-wrapper">
-              <nut-radiogroup direction="horizontal" v-model="form.source">
-                <nut-radio shape="button" label="remote"
-                  >{{ $t(`editorPage.subConfig.basic.source.remote`) }}
+              <nut-radiogroup
+                direction="horizontal"
+                v-model="form.source"
+              >
+                <nut-radio
+                  shape="button"
+                  label="remote"
+                >{{ $t(`editorPage.subConfig.basic.source.remote`) }}
                 </nut-radio>
-                <nut-radio shape="button" label="local"
-                  >{{ $t(`editorPage.subConfig.basic.source.local`) }}
+                <nut-radio
+                  shape="button"
+                  label="local"
+                >{{ $t(`editorPage.subConfig.basic.source.local`) }}
                 </nut-radio>
               </nut-radiogroup>
             </div>
@@ -136,15 +147,24 @@
             prop="mergeSources"
           >
             <div class="radio-wrapper">
-              <nut-radiogroup direction="horizontal" v-model="form.mergeSources">
-                <nut-radio shape="button" label=""
-                  >{{ $t(`editorPage.subConfig.basic.source.noMerge`) }}
+              <nut-radiogroup
+                direction="horizontal"
+                v-model="form.mergeSources"
+              >
+                <nut-radio
+                  shape="button"
+                  label=""
+                >{{ $t(`editorPage.subConfig.basic.source.noMerge`) }}
                 </nut-radio>
-                <nut-radio shape="button" label="localFirst"
-                  >{{ $t(`editorPage.subConfig.basic.source.localFirst`) }}
+                <nut-radio
+                  shape="button"
+                  label="localFirst"
+                >{{ $t(`editorPage.subConfig.basic.source.localFirst`) }}
                 </nut-radio>
-                <nut-radio shape="button" label="remoteFirst"
-                  >{{ $t(`editorPage.subConfig.basic.source.remoteFirst`) }}
+                <nut-radio
+                  shape="button"
+                  label="remoteFirst"
+                >{{ $t(`editorPage.subConfig.basic.source.remoteFirst`) }}
                 </nut-radio>
               </nut-radiogroup>
             </div>
@@ -189,7 +209,7 @@
           class="ignore-failed-wrapper"
         >
           <div class="swtich-wrapper">
-            <nut-switch v-model="form.ignoreFailedRemoteSub"/>
+            <nut-switch v-model="form.ignoreFailedRemoteSub" />
           </div>
         </nut-form-item>
       </nut-form>
@@ -208,7 +228,12 @@
   </div>
 
   <div class="bottom-btn-wrapper">
-    <nut-button @click="compare" class="compare-btn btn" plain shape="square">
+    <nut-button
+      @click="compare"
+      class="compare-btn btn"
+      plain
+      shape="square"
+    >
       <font-awesome-icon icon="fa-solid fa-eye" />{{
         $t('editorPage.subConfig.btn.compare')
       }}
@@ -233,458 +258,469 @@
 </template>
 
 <script lang="ts" setup>
-  import { useSubsApi } from '@/api/subs';
-  import icon from '@/assets/icons/logo.svg';
-  import { usePopupRoute } from '@/hooks/usePopupRoute';
-  import { useAppNotifyStore } from '@/store/appNotify';
-  import { useGlobalStore } from '@/store/global';
-  import { useSubsStore } from '@/store/subs';
-  import { addItem, deleteItem } from '@/utils/actionsOperate';
-  import { actionsToProcess } from '@/utils/actionsToPorcess';
-  import { initStores } from '@/utils/initApp';
-  import CompareTable from '@/views/CompareTable.vue';
-  import ActionBlock from '@/views/editor/ActionBlock.vue';
-  import CommonBlock from '@/views/editor/CommonBlock.vue';
-  import ActionRadio from '@/views/editor/components/ActionRadio.vue';
-  import FilterSelect from '@/views/editor/components/FilterSelect.vue';
-  import HandleDuplicate from '@/views/editor/components/HandleDuplicate.vue';
-  import Regex from '@/views/editor/components/Regex.vue';
-  import Script from '@/views/editor/components/Script.vue';
-  import { Dialog, Toast } from '@nutui/nutui';
-  import { storeToRefs } from 'pinia';
-  import {
-    computed,
-    provide,
-    reactive,
-    ref,
-    shallowRef,
-    toRaw,
-    watchEffect,
-  } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute, useRouter } from 'vue-router';
+import { useSubsApi } from '@/api/subs'
+import icon from '@/assets/icons/logo.svg'
+import { usePopupRoute } from '@/hooks/usePopupRoute'
+import { useAppNotifyStore } from '@/store/appNotify'
+import { useGlobalStore } from '@/store/global'
+import { useSubsStore } from '@/store/subs'
+import { addItem, deleteItem } from '@/utils/actionsOperate'
+import { actionsToProcess } from '@/utils/actionsToPorcess'
+import { initStores } from '@/utils/initApp'
+import CompareTable from '@/views/CompareTable.vue'
+import ActionBlock from '@/views/editor/ActionBlock.vue'
+import CommonBlock from '@/views/editor/CommonBlock.vue'
+import ActionRadio from '@/views/editor/components/ActionRadio.vue'
+import FilterSelect from '@/views/editor/components/FilterSelect.vue'
+import HandleDuplicate from '@/views/editor/components/HandleDuplicate.vue'
+import Regex from '@/views/editor/components/Regex.vue'
+import Script from '@/views/editor/components/Script.vue'
+import { Dialog, Toast } from '@nutui/nutui'
+import { storeToRefs } from 'pinia'
+import {
+  computed,
+  provide,
+  reactive,
+  ref,
+  shallowRef,
+  toRaw,
+  watchEffect
+} from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
-  const { t } = useI18n();
-  const route = useRoute();
-  const router = useRouter();
-  const subsApi = useSubsApi();
-  const editType = route.params.editType as string;
-  const configName = route.params.id as string;
-  const subsStore = useSubsStore();
-  const { showNotify } = useAppNotifyStore();
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const subsApi = useSubsApi()
+const editType = route.params.editType as string
+const configName = route.params.id as string
+const subsStore = useSubsStore()
+const { showNotify } = useAppNotifyStore()
 
-  const globalStore = useGlobalStore();
-  const { bottomSafeArea, isEditorCommon } = storeToRefs(globalStore);
-  const padding = bottomSafeArea.value + 'px';
+const globalStore = useGlobalStore()
+const { bottomSafeArea, isEditorCommon } = storeToRefs(globalStore)
+const padding = bottomSafeArea.value + 'px'
 
-  const sub = computed(() => subsStore.getOneSub(configName));
-  const collection = computed(() => subsStore.getOneCollection(configName));
+const sub = computed(() => subsStore.getOneSub(configName))
+const collection = computed(() => subsStore.getOneCollection(configName))
 
-  const subsSelectList = computed(() => {
-    return subsStore.subs.map(item => {
-      return [
-        item.name,
-        item.displayName || item['display-name'] || item.name,
-        item.icon || icon,
-      ];
-    });
-  });
+const subsSelectList = computed(() => {
+  return subsStore.subs.map(item => {
+    return [
+      item.name,
+      item.displayName || item['display-name'] || item.name,
+      item.icon || icon
+    ]
+  })
+})
 
-  const compareTableIsVisible = ref(false);
-  usePopupRoute(compareTableIsVisible);
-  const compareData = ref();
+const compareTableIsVisible = ref(false)
+usePopupRoute(compareTableIsVisible)
+const compareData = ref()
 
-  const isInit = ref(false);
-  const ruleForm = ref<any>(null);
-  const actionsChecked = reactive([]);
-  const actionsList = reactive([]);
-  const isget = ref(false);
-  const form = reactive<any>({
-    name: '',
-    displayName: '',
-    mergeSources: '',
-    ignoreFailedRemoteSub: false,
-    icon: '',
-    process: [
-      {
-        type: 'Quick Setting Operator',
-      },
-    ],
-  });
-  provide('form', form);
-
-  // 排除非动作卡片
-  const ignoreList = ['Quick Setting Operator'];
-
-  watchEffect(() => {
-    if (isInit.value) return;
-    if (configName === 'UNTITLED') {
-      // 新建时，初始化表单
-      switch (editType) {
-        case 'collections':
-          form.subscriptions = [];
-          break;
-        case 'subs':
-          form.source = 'remote';
-          form.url = '';
-          form.content = '';
-          form.ua = '';
-          break;
-      }
-      // 标记 加载完成
-      isInit.value = true;
-      return;
+const isInit = ref(false)
+const ruleForm = ref<any>(null)
+const actionsChecked = reactive([])
+const actionsList = reactive([])
+const isget = ref(false)
+const form = reactive<any>({
+  name: '',
+  displayName: '',
+  mergeSources: '',
+  ignoreFailedRemoteSub: false,
+  icon: '',
+  process: [
+    {
+      type: 'Quick Setting Operator'
     }
+  ]
+})
+provide('form', form)
 
-    const sourceData: any = toRaw(sub.value) || toRaw(collection.value);
-    const newProcess = JSON.parse(JSON.stringify(sourceData.process));
-    form.mergeSources = sourceData.mergeSources;
-    form.ignoreFailedRemoteSub = sourceData.ignoreFailedRemoteSub;
-    form.name = sourceData.name;
-    form.displayName = sourceData.displayName || sourceData['display-name'];
-    form.icon = sourceData.icon;
-    form.process = newProcess;
+// 排除非动作卡片
+const ignoreList = ['Quick Setting Operator']
 
+watchEffect(() => {
+  if (isInit.value) return
+  if (configName === 'UNTITLED') {
+    // 新建时，初始化表单
     switch (editType) {
       case 'collections':
-        form.subscriptions = [];
-        form.subscriptions.push(...sourceData.subscriptions);
-        break;
+        form.subscriptions = []
+        break
       case 'subs':
-        form.source = sourceData.source;
-        form.url = sourceData.url;
-        form.content = sourceData.content;
-        form.ua = sourceData.ua;
-        break;
-    }
-
-    if (sourceData.process.length > 0) {
-      form.process.forEach(item => {
-        const { type, id } = item;
-
-        if (!ignoreList.includes(type)) {
-          actionsChecked.push([id, true]);
-          const action = {
-            type,
-            id,
-            tipsDes: t(`editorPage.subConfig.nodeActions['${type}'].tipsDes`),
-            component: null,
-          };
-          switch (type) {
-            case 'Flag Operator':
-            case 'Sort Operator':
-            case 'Resolve Domain Operator':
-              action.component = shallowRef(ActionRadio);
-              break;
-            case 'Region Filter':
-            case 'Type Filter':
-              action.component = shallowRef(FilterSelect);
-              break;
-            case 'Regex Filter':
-            case 'Regex Sort Operator':
-            case 'Regex Delete Operator':
-            case 'Regex Rename Operator':
-              action.component = shallowRef(Regex);
-              break;
-            case 'Handle Duplicate Operator':
-              action.component = shallowRef(HandleDuplicate);
-              break;
-            case 'Script Filter':
-            case 'Script Operator':
-              action.component = shallowRef(Script);
-              break;
-            default:
-              break;
-          }
-          actionsList.push(action);
-        }
-      });
+        form.source = 'remote'
+        form.url = ''
+        form.content = ''
+        form.ua = ''
+        break
     }
     // 标记 加载完成
-    isInit.value = true;
-    return;
-  });
+    isInit.value = true
+    return
+  }
 
-  const addAction = val => {
-    addItem(form, actionsList, actionsChecked, val, t);
-  };
+  const sourceData: any = toRaw(sub.value) || toRaw(collection.value)
+  const newProcess = JSON.parse(JSON.stringify(sourceData.process))
+  form.mergeSources = sourceData.mergeSources
+  form.ignoreFailedRemoteSub = sourceData.ignoreFailedRemoteSub
+  form.name = sourceData.name
+  form.displayName = sourceData.displayName || sourceData['display-name']
+  form.icon = sourceData.icon
+  form.process = newProcess
 
-  const deleteAction = id => {
-    deleteItem(form, actionsList, actionsChecked, id);
-  };
+  switch (editType) {
+    case 'collections':
+      form.subscriptions = []
+      form.subscriptions.push(...sourceData.subscriptions)
+      break
+    case 'subs':
+      form.source = sourceData.source
+      form.url = sourceData.url
+      form.content = sourceData.content
+      form.ua = sourceData.ua
+      break
+  }
 
-  const closeCompare = () => {
-    compareTableIsVisible.value = false;
-    router.back();
-  };
+  if (sourceData.process.length > 0) {
+    form.process.forEach(item => {
+      const { type, id } = item
 
-  const compare = () => {
-    ruleForm.value.validate().then(async ({ valid, errors }: any) => {
-      // 如果验证失败
-      if (!valid) {
-        Dialog({
-          title: t(`editorPage.subConfig.pop.errorTitle`),
-          content: errors[0].message,
-          popClass: 'auto-dialog',
-          noCancelBtn: true,
-          okText: t(`editorPage.subConfig.pop.errorBtn`),
-          // @ts-ignore
-          closeOnClickOverlay: true,
-        });
-        return;
-      }
-
-      Toast.loading('生成节点对比中...', { id: 'compare', cover: true, duration: 1500 });
-      const data: any = JSON.parse(JSON.stringify(toRaw(form)));
-      data.process = actionsToProcess(data.process, actionsList, ignoreList);
-
-      // 过滤掉预览开关关闭的操作
-      actionsChecked.forEach(item => {
-        if (!item[1]) {
-          const index = data.process.findIndex(i => i.id === item[0]);
-          if (index > -1) {
-            data.process.splice(index, 1);
-          }
+      if (!ignoreList.includes(type)) {
+        actionsChecked.push([id, true])
+        const action = {
+          type,
+          id,
+          tipsDes: t(`editorPage.subConfig.nodeActions['${type}'].tipsDes`),
+          component: null
         }
-      });
-
-      const type = editType === 'collections' ? 'collection' : 'sub';
-      const res = await subsApi.compareSub(type, data);
-      if (res?.data?.status === 'success') {
-        compareData.value = res.data.data;
-        compareTableIsVisible.value = true;
-        Toast.hide('compare');
+        switch (type) {
+          case 'Flag Operator':
+          case 'Sort Operator':
+          case 'Resolve Domain Operator':
+            action.component = shallowRef(ActionRadio)
+            break
+          case 'Region Filter':
+          case 'Type Filter':
+            action.component = shallowRef(FilterSelect)
+            break
+          case 'Regex Filter':
+          case 'Regex Sort Operator':
+          case 'Regex Delete Operator':
+          case 'Regex Rename Operator':
+            action.component = shallowRef(Regex)
+            break
+          case 'Handle Duplicate Operator':
+            action.component = shallowRef(HandleDuplicate)
+            break
+          case 'Script Filter':
+          case 'Script Operator':
+            action.component = shallowRef(Script)
+            break
+          default:
+            break
+        }
+        actionsList.push(action)
       }
-    });
-  };
+    })
+  }
+  // 标记 加载完成
+  isInit.value = true
+  return
+})
 
-  const submit = () => {
-    if (isget.value){
-    showNotify({
-        type: 'success',
-        title: '拉取订阅中，请勿重复点击...',
-      });
-    return;
+const addAction = val => {
+  addItem(form, actionsList, actionsChecked, val, t)
+}
+
+const deleteAction = id => {
+  deleteItem(form, actionsList, actionsChecked, id)
+}
+
+const closeCompare = () => {
+  compareTableIsVisible.value = false
+  router.back()
+}
+
+const compare = () => {
+  ruleForm.value.validate().then(async ({ valid, errors }: any) => {
+    // 如果验证失败
+    if (!valid) {
+      Dialog({
+        title: t(`editorPage.subConfig.pop.errorTitle`),
+        content: errors[0].message,
+        popClass: 'auto-dialog',
+        noCancelBtn: true,
+        okText: t(`editorPage.subConfig.pop.errorBtn`),
+        // @ts-ignore
+        closeOnClickOverlay: true
+      })
+      return
     }
-    ruleForm.value.validate().then(async ({ valid, errors }: any) => {
-      isget.value=true;
-      // 如果验证失败
-      if (!valid) {
-        isget.value=false;
-        Dialog({
-          title: t(`editorPage.subConfig.pop.errorTitle`),
-          content: errors[0].message,
-          popClass: 'auto-dialog',
-          noCancelBtn: true,
-          okText: t(`editorPage.subConfig.pop.errorBtn`),
-          // @ts-ignore
-          closeOnClickOverlay: true,
-        });
-        return;
-      }
-      Toast.loading('拉取订阅中...', { id: 'submits', cover: true, duration: 1500 });
-      // 如果验证成功，开始保存/修改
-      const data: any = JSON.parse(JSON.stringify(toRaw(form)));
-      data['display-name'] = data.displayName;
-      data.process = actionsToProcess(data.process, actionsList, ignoreList);
 
-      // console.log('submit.....\n', data);
+    Toast.loading('生成节点对比中...', {
+      id: 'compare',
+      cover: true,
+      duration: 1500
+    })
+    const data: any = JSON.parse(JSON.stringify(toRaw(form)))
+    data.process = actionsToProcess(data.process, actionsList, ignoreList)
 
-      let res = null;
-
-      if (configName === 'UNTITLED') {
-        res = await subsApi.createSub(editType, data);
-        await subsStore.fetchSubsData();
-        if (data.source === 'remote') await initStores(false, true, false);
-      } else {
-        let apiType = '';
-        if (editType === 'subs') {
-          apiType = 'sub';
-        } else if (editType === 'collections') {
-          apiType = 'collection';
-        }
-        res = await subsApi.editSub(apiType, configName, data);
-
-        if (configName === data.name) {
-          // @ts-ignore
-          await subsStore.updateOneData(editType, configName);
-        } else {
-          await subsStore.fetchSubsData();
+    // 过滤掉预览开关关闭的操作
+    actionsChecked.forEach(item => {
+      if (!item[1]) {
+        const index = data.process.findIndex(i => i.id === item[0])
+        if (index > -1) {
+          data.process.splice(index, 1)
         }
       }
+    })
 
-      if (res?.data?.status === 'success') {
-        router.replace('/').then(() => {
-          if (res)
-            showNotify({
-              type: 'success',
-              title: t(`editorPage.subConfig.pop.succeedMsg`),
-            });
+    const type = editType === 'collections' ? 'collection' : 'sub'
+    const res = await subsApi.compareSub(type, data)
+    if (res?.data?.status === 'success') {
+      compareData.value = res.data.data
+      compareTableIsVisible.value = true
+      Toast.hide('compare')
+    }
+  })
+}
 
-        });
-  
+const submit = () => {
+  if (isget.value) {
+    showNotify({
+      type: 'success',
+      title: '拉取订阅中，请勿重复点击...'
+    })
+    return
+  }
+  ruleForm.value.validate().then(async ({ valid, errors }: any) => {
+    isget.value = true
+    // 如果验证失败
+    if (!valid) {
+      isget.value = false
+      Dialog({
+        title: t(`editorPage.subConfig.pop.errorTitle`),
+        content: errors[0].message,
+        popClass: 'auto-dialog',
+        noCancelBtn: true,
+        okText: t(`editorPage.subConfig.pop.errorBtn`),
+        // @ts-ignore
+        closeOnClickOverlay: true
+      })
+      return
+    }
+    Toast.loading('拉取订阅中...', {
+      id: 'submits',
+      cover: true,
+      duration: 1500
+    })
+    // 如果验证成功，开始保存/修改
+    const data: any = JSON.parse(JSON.stringify(toRaw(form)))
+    data['display-name'] = data.displayName
+    data.process = actionsToProcess(data.process, actionsList, ignoreList)
+
+    // console.log('submit.....\n', data);
+
+    let res = null
+
+    if (configName === 'UNTITLED') {
+      res = await subsApi.createSub(editType, data)
+      await subsStore.fetchSubsData()
+      if (data.source === 'remote') await initStores(false, true, false)
+    } else {
+      let apiType = ''
+      if (editType === 'subs') {
+        apiType = 'sub'
+      } else if (editType === 'collections') {
+        apiType = 'collection'
       }
-      isget.value=false;
-      Toast.hide('submits');
-    });
-  };
+      res = await subsApi.editSub(apiType, configName, data)
 
-  // 名称验证器
-  const nameValidator = (val: string): Promise<boolean> => {
-    return new Promise(resolve => {
-      if (val === 'UNTITLED') resolve(false);
-      if (/\//.test(val)) {
-        resolve(false)
-      }
-      const nameList = subsStore.subs.map(item => item.name);
-      nameList.includes(val) && configName !== val
-        ? resolve(false)
-        : resolve(true);
-    });
-  };
-
-  // url 格式验证器
-  const urlValidator = (val: string): Promise<boolean> => {
-    return new Promise(resolve => {
-      if (/\n/.test(val)) {
-        resolve(val.split(/[\r\n]+/).map(i => i.trim()).filter(i => i.length).every(i => /^(http|https):\/\/\S+$/.test(i)))
+      if (configName === data.name) {
+        // @ts-ignore
+        await subsStore.updateOneData(editType, configName)
       } else {
-        resolve(/^(http|https):\/\/\S+$/.test(val));  
+        await subsStore.fetchSubsData()
       }
-      
-    });
-  };
+    }
 
-  // 失去焦点触发验证
-  const customerBlurValidate = (prop: string) => {
-    ruleForm.value.validate(prop);
-  };
+    if (res?.data?.status === 'success') {
+      router.replace('/sub').then(() => {
+        if (res)
+          showNotify({
+            type: 'success',
+            title: t(`editorPage.subConfig.pop.succeedMsg`)
+          })
+      })
+    }
+    isget.value = false
+    Toast.hide('submits')
+  })
+}
+
+// 名称验证器
+const nameValidator = (val: string): Promise<boolean> => {
+  return new Promise(resolve => {
+    if (val === 'UNTITLED') resolve(false)
+    if (/\//.test(val)) {
+      resolve(false)
+    }
+    const nameList = subsStore.subs.map(item => item.name)
+    nameList.includes(val) && configName !== val
+      ? resolve(false)
+      : resolve(true)
+  })
+}
+
+// url 格式验证器
+const urlValidator = (val: string): Promise<boolean> => {
+  return new Promise(resolve => {
+    if (/\n/.test(val)) {
+      resolve(
+        val
+          .split(/[\r\n]+/)
+          .map(i => i.trim())
+          .filter(i => i.length)
+          .every(i => /^(http|https):\/\/\S+$/.test(i))
+      )
+    } else {
+      resolve(/^(http|https):\/\/\S+$/.test(val))
+    }
+  })
+}
+
+// 失去焦点触发验证
+const customerBlurValidate = (prop: string) => {
+  ruleForm.value.validate(prop)
+}
 </script>
 
 <style lang="scss" scoped>
-  .page-wrapper {
-    padding: 0 var(--safe-area-side) calc(v-bind('padding') + 63px)
-      var(--safe-area-side);
+.page-wrapper {
+  padding: 0 var(--safe-area-side) calc(v-bind('padding') + 63px)
+    var(--safe-area-side);
 
-    :deep(.nut-cell-group__warp) {
-      border-radius: var(--item-card-radios);
+  :deep(.nut-cell-group__warp) {
+    border-radius: var(--item-card-radios);
+  }
+}
+
+.radio-wrapper {
+  display: flex;
+  justify-content: end;
+
+  :deep(.nut-radio__button.false) {
+    background: var(--divider-color);
+    border-color: transparent;
+    color: var(--second-text-color);
+  }
+}
+
+.form-block-wrapper {
+  position: relative;
+}
+
+.bottom-btn-wrapper {
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  bottom: 0;
+  width: 100%;
+  padding: 8px var(--safe-area-side) calc(v-bind('padding') + 8px)
+    var(--safe-area-side);
+  z-index: 20;
+  background: var(--background-color);
+  border-top: 1px solid var(--divider-color);
+
+  .btn {
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      margin-right: 4px;
     }
   }
 
-  .radio-wrapper {
+  .compare-btn {
+    background: transparent;
+    width: 36%;
+  }
+
+  .submit-btn {
+    width: 62%;
+  }
+}
+
+.ignore-failed-wrapper {
+  flex-direction: row;
+  justify-content: space-between;
+  :deep(.nut-form-item__label) {
+    width: auto;
+  }
+  .swtich-wrapper {
     display: flex;
     justify-content: end;
-
-    :deep(.nut-radio__button.false) {
-      background: var(--divider-color);
-      border-color: transparent;
-      color: var(--second-text-color);
-    }
   }
+}
 
-  .form-block-wrapper {
-    position: relative;
-  }
+.include-subs-wrapper {
+  flex-direction: column;
 
-  .bottom-btn-wrapper {
-    position: fixed;
-    display: flex;
-    justify-content: space-between;
-    bottom: 0;
+  :deep(.nut-form-item__label) {
     width: 100%;
-    padding: 8px var(--safe-area-side) calc(v-bind('padding') + 8px)
-      var(--safe-area-side);
-    z-index: 20;
-    background: var(--background-color);
-    border-top: 1px solid var(--divider-color);
+    margin-bottom: 12px;
+  }
 
-    .btn {
-      border-radius: 8px;
-      padding: 4px 12px;
-      font-size: 14px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  .subs-checkbox-wrapper {
+    flex-direction: row-reverse;
 
-      svg {
-        margin-right: 4px;
+    .subs-checkbox {
+      justify-content: space-between;
+      margin-left: 16px;
+      padding: 16px 0 0 0;
+
+      &:not(:last-child) {
+        padding: 16px 0 16px 0;
+        border-bottom: 1px solid;
+        border-color: var(--divider-color);
       }
-    }
 
-    .compare-btn {
-      background: transparent;
-      width: 36%;
-    }
+      .sub-img-wrapper {
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: var(--second-text-color);
 
-    .submit-btn {
-      width: 62%;
-    }
-  }
-
-  .ignore-failed-wrapper {
-    flex-direction: row;
-    justify-content: space-between;
-    :deep(.nut-form-item__label) {
-      width: auto;
-    }
-    .swtich-wrapper {
-      display: flex;
-      justify-content: end;
-    }
-  }
-
-  .include-subs-wrapper {
-    flex-direction: column;
-
-    :deep(.nut-form-item__label) {
-      width: 100%;
-      margin-bottom: 12px;
-    }
-
-    .subs-checkbox-wrapper {
-      flex-direction: row-reverse;
-
-      .subs-checkbox {
-        justify-content: space-between;
-        margin-left: 16px;
-        padding: 16px 0 0 0;
-
-        &:not(:last-child) {
-          padding: 16px 0 16px 0;
-          border-bottom: 1px solid;
-          border-color: var(--divider-color);
+        span {
+          max-width: 56vw;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          word-wrap: break-word;
+          word-break: break-all;
+          overflow: hidden;
         }
 
-        .sub-img-wrapper {
-          max-width: 100%;
-          display: flex;
-          align-items: center;
-          font-size: 14px;
-          color: var(--second-text-color);
+        .sub-item-customer-icon {
+          margin-right: 12px;
 
-          span {
-            max-width: 56vw;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-            word-wrap: break-word;
-            word-break: break-all;
-            overflow: hidden;
-          }
+          :deep(img) {
+            object-fit: contain;
 
-          .sub-item-customer-icon {
-            margin-right: 12px;
-
-            :deep(img) {
-              object-fit: contain;
-
-              &:not(.nut-icon__img) {
-                filter: brightness(var(--img-brightness));
-              }
+            &:not(.nut-icon__img) {
+              filter: brightness(var(--img-brightness));
             }
           }
         }
       }
     }
   }
+}
 </style>
