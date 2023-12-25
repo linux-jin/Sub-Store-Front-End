@@ -13,14 +13,14 @@ export default {
     'third-color': '#0ED57D',
 
     'danger-color': '#E56459',
-    'succeed-color': '#0ED57D',
+    'succeed-color': '#49bb88',
 
     // icon色
     'icon-nav-bar-right': '#606266',
     'unimportant-icon-color': '#FFFFFF34',
 
     // 组件色
-    'status-bar-background-color': '#12121299',
+    'status-bar-background-color': '#121212',
     'background-color': '#121212',
     'nav-bar-color': '#12121299',
     'tab-bar-color': '#121212AA',
@@ -30,7 +30,7 @@ export default {
     'dialog-color': '#202020',
     'switch-close-background-color': '#FFFFFF14',
     'switch-active-background-color': '#478EF2',
-    'compare-item-background-color': '#202020',
+    'compare-item-background-color': '#191919',
     'picker-mask-near-color': '#12121248',
     'picker-mask-far-color': '#121212',
 
@@ -50,3 +50,5 @@ export default {
     'compare-tag-background-color': '#FFFFFF22',
   },
 };
+//--second-text-color
+//--comment-text-color 覆盖

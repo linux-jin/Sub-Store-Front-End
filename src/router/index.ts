@@ -11,11 +11,16 @@ import Sub from '@/views/Sub.vue';
 import SubEditor from '@/views/SubEditor.vue';
 
 import Sync from '@/views/Sync.vue';
-import themeSetting from '@/views/themeSetting.vue';
+// import themeSetting from '@/views/themeSetting.vue';
+import moreSetting from '@/views/settings/moreSetting.vue';
 import { Toast } from '@nutui/nutui';
 import { toRaw } from 'vue';
 import 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
+import aboutUs from '@/views/settings/AboutUs.vue';
+import APISetting from '@/views/settings/APISetting.vue';
+
+// import { SwipeBack } from 'vue-swipe-back'
 
 let globalStore = null;
 
@@ -72,11 +77,38 @@ const router = createRouter({
             needNavBack: true,
           },
         },
+        // {
+        //   path: '/settings/theme',
+        //   component: themeSetting,
+        //   meta: {
+        //     title: 'themeSetting',
+        //     needTabBar: false,
+        //     needNavBack: true,
+        //   },
+        // },
         {
-          path: '/settings/theme',
-          component: themeSetting,
+          path: '/settings/more',
+          component: moreSetting,
           meta: {
-            title: 'themeSetting',
+            title: 'moreSetting',
+            needTabBar: false,
+            needNavBack: true,
+          },
+        },
+        {
+          path: '/settings/api',
+          component: APISetting,
+          meta: {
+            title: 'apiSetting',
+            needTabBar: false,
+            needNavBack: true,
+          },
+        },
+        {
+          path: '/aboutUs',
+          component: aboutUs,
+          meta: {
+            title: 'aboutUs',
             needTabBar: false,
             needNavBack: true,
           },
@@ -113,9 +145,11 @@ router.beforeResolve(async to => {
       .then(async res => {
         const envNow = res;
         const storeEnv = toRaw(globalStore.env);
-        if (envNow.data.status === 'success') {
+        if (envNow?.data?.status === 'success') {
           const backend = envNow.data.data.backend;
           const version = envNow.data.data.version;
+          const hasNewVersion = envNow.data.data.hasNewVersion;
+          const latestVersion = envNow.data.data.latestVersion;
           if (backend !== storeEnv.backend || version !== storeEnv.version) {
             Toast.loading('检测到后端变化，更新数据中...', {
               cover: true,

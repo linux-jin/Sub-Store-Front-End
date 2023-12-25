@@ -18,7 +18,7 @@
       <div class="compare-page-body">
         <div class="block-wrapper">
           <!--块标题-->
-          <div class="sticky-title-wrapper compare-title">
+          <div class="sticky-title-wrapperse compare-title">
             <p>{{ $t(`comparePage.remain.title`) }}</p>
           </div>
 
@@ -45,7 +45,7 @@
 
           <!--表格内容-->
           <table class="compare-table-body">
-            <template v-for="[processed, original] in data" :key="processed.id">
+            <template v-for="[processed = {}, original = {}] in data" :key="processed.id">
               <tr
                 v-if="isProcessedVisible"
                 class="compare-table-row processed-tr"
@@ -158,7 +158,7 @@
 
         <div class="block-wrapper" v-if="originalData.length > 0">
           <!--块标题-->
-          <div class="sticky-title-wrapper compare-title">
+          <div class="sticky-title-wrapperse compare-title">
             <p>{{ $t(`comparePage.filter.title`) }}</p>
           </div>
 
@@ -318,7 +318,7 @@
     });
     const nodeData = toRaw(val);
     const res = await useSubsApi().getSubInfo(nodeData);
-    if (res.data.status === 'success') {
+    if (res?.data?.status === 'success') {
       ipApi.value = res.data.data;
       nodeInfo.value = nodeData;
       nodeInfoIsVisible.value = true;

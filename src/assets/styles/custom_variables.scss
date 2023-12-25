@@ -75,6 +75,15 @@ $cell-group-title-color: $text-color-3;
 $cell-group-desc-color: $text-color-4;
 $cell-group-background-color: $card-color;
 
+// collapse
+$collapse-item-color: $text-color-2;
+$collapse-item-disabled-color: $text-color-4;
+$collapse-item-icon-color: $text-color-3;
+$collapse-item-sub-title-color: $text-color-3;
+$collapse-wrapper-content-color: $text-color-3;
+$collapse-wrapper-content-line-height: 2;
+$collapse-wrapper-content-background-color: $card-color;
+
 // checkbox
 $checkbox-label-color: $text-color-2;
 $checkbox-label-disable-color: $text-color-4;
@@ -107,3 +116,4 @@ $notify-primary-background-color: linear-gradient(
 );
 $notify-success-background-color: var(--succeed-color);
 $notify-danger-background-color: var(--danger-color);
+$badge-border:none;

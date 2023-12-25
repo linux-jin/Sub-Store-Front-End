@@ -18,7 +18,7 @@
             },
             {
               validator: nameValidator,
-              message: $t(`editorPage.subConfig.basic.name.isExist`),
+              message: $t(`editorPage.subConfig.basic.name.isInvalid`),
             },
           ]"
         >
@@ -103,13 +103,14 @@
           </nut-form-item>
           <nut-form-item
             v-else-if="form.source === 'local'"
-            :label="$t(`editorPage.subConfig.basic.content.label`)"
+            :label="undefined"
             prop="content"
           >
             <nut-textarea
               class="textarea-wrapper"
               v-model="form.content"
-              :autosize="{ maxHeight: 110, minHeight: 50 }"
+              text-align="left"
+              :autosize="{ maxHeight: 410, minHeight: 50 }"
               :placeholder="
                 $t(`editorPage.subConfig.basic.content.placeholder`)
               "
@@ -129,7 +130,27 @@
               type="text"
             />
           </nut-form-item>
+
+          <nut-form-item
+            :label="$t(`editorPage.subConfig.basic.source.mergeSources`)"
+            prop="mergeSources"
+          >
+            <div class="radio-wrapper">
+              <nut-radiogroup direction="horizontal" v-model="form.mergeSources">
+                <nut-radio shape="button" label=""
+                  >{{ $t(`editorPage.subConfig.basic.source.noMerge`) }}
+                </nut-radio>
+                <nut-radio shape="button" label="localFirst"
+                  >{{ $t(`editorPage.subConfig.basic.source.localFirst`) }}
+                </nut-radio>
+                <nut-radio shape="button" label="remoteFirst"
+                  >{{ $t(`editorPage.subConfig.basic.source.remoteFirst`) }}
+                </nut-radio>
+              </nut-radiogroup>
+            </div>
+          </nut-form-item>
         </template>
+
         <template v-else-if="editType === 'collections'">
           <nut-form-item
             :label="$t(`editorPage.subConfig.basic.subscriptions.label`)"
@@ -161,11 +182,21 @@
             </nut-checkboxgroup>
           </nut-form-item>
         </template>
+
+        <nut-form-item
+          :label="$t(`editorPage.subConfig.basic.ignoreFailedRemoteSub.label`)"
+          prop="ignoreFailedRemoteSub"
+          class="ignore-failed-wrapper"
+        >
+          <div class="swtich-wrapper">
+            <nut-switch v-model="form.ignoreFailedRemoteSub"/>
+          </div>
+        </nut-form-item>
       </nut-form>
     </div>
 
     <!-- 常用配置 -->
-    <CommonBlock />
+    <CommonBlock v-if="isEditorCommon" />
 
     <!-- 节点操作 -->
     <ActionBlock
@@ -220,6 +251,7 @@
   import Regex from '@/views/editor/components/Regex.vue';
   import Script from '@/views/editor/components/Script.vue';
   import { Dialog, Toast } from '@nutui/nutui';
+  import { storeToRefs } from 'pinia';
   import {
     computed,
     provide,
@@ -241,8 +273,9 @@
   const subsStore = useSubsStore();
   const { showNotify } = useAppNotifyStore();
 
-  const { bottomSafeArea } = useGlobalStore();
-  const padding = bottomSafeArea + 'px';
+  const globalStore = useGlobalStore();
+  const { bottomSafeArea, isEditorCommon } = storeToRefs(globalStore);
+  const padding = bottomSafeArea.value + 'px';
 
   const sub = computed(() => subsStore.getOneSub(configName));
   const collection = computed(() => subsStore.getOneCollection(configName));
@@ -265,10 +298,12 @@
   const ruleForm = ref<any>(null);
   const actionsChecked = reactive([]);
   const actionsList = reactive([]);
-
+  const isget = ref(false);
   const form = reactive<any>({
     name: '',
     displayName: '',
+    mergeSources: '',
+    ignoreFailedRemoteSub: false,
     icon: '',
     process: [
       {
@@ -303,6 +338,8 @@
 
     const sourceData: any = toRaw(sub.value) || toRaw(collection.value);
     const newProcess = JSON.parse(JSON.stringify(sourceData.process));
+    form.mergeSources = sourceData.mergeSources;
+    form.ignoreFailedRemoteSub = sourceData.ignoreFailedRemoteSub;
     form.name = sourceData.name;
     form.displayName = sourceData.displayName || sourceData['display-name'];
     form.icon = sourceData.icon;
@@ -397,7 +434,7 @@
         return;
       }
 
-      Toast.loading('生成节点对比中...', { id: 'compare', cover: true });
+      Toast.loading('生成节点对比中...', { id: 'compare', cover: true, duration: 1500 });
       const data: any = JSON.parse(JSON.stringify(toRaw(form)));
       data.process = actionsToProcess(data.process, actionsList, ignoreList);
 
@@ -413,7 +450,7 @@
 
       const type = editType === 'collections' ? 'collection' : 'sub';
       const res = await subsApi.compareSub(type, data);
-      if (res.data.status === 'success') {
+      if (res?.data?.status === 'success') {
         compareData.value = res.data.data;
         compareTableIsVisible.value = true;
         Toast.hide('compare');
@@ -422,9 +459,18 @@
   };
 
   const submit = () => {
+    if (isget.value){
+    showNotify({
+        type: 'success',
+        title: '拉取订阅中，请勿重复点击...',
+      });
+    return;
+    }
     ruleForm.value.validate().then(async ({ valid, errors }: any) => {
+      isget.value=true;
       // 如果验证失败
       if (!valid) {
+        isget.value=false;
         Dialog({
           title: t(`editorPage.subConfig.pop.errorTitle`),
           content: errors[0].message,
@@ -436,7 +482,7 @@
         });
         return;
       }
-
+      Toast.loading('拉取订阅中...', { id: 'submits', cover: true, duration: 1500 });
       // 如果验证成功，开始保存/修改
       const data: any = JSON.parse(JSON.stringify(toRaw(form)));
       data['display-name'] = data.displayName;
@@ -467,20 +513,29 @@
         }
       }
 
-      router.replace('/').then(() => {
-        if (res)
-          showNotify({
-            type: 'success',
-            title: t(`editorPage.subConfig.pop.succeedMsg`),
-          });
-      });
+      if (res?.data?.status === 'success') {
+        router.replace('/').then(() => {
+          if (res)
+            showNotify({
+              type: 'success',
+              title: t(`editorPage.subConfig.pop.succeedMsg`),
+            });
+
+        });
+  
+      }
+      isget.value=false;
+      Toast.hide('submits');
     });
   };
 
-  // 唯一名称验证器
+  // 名称验证器
   const nameValidator = (val: string): Promise<boolean> => {
     return new Promise(resolve => {
       if (val === 'UNTITLED') resolve(false);
+      if (/\//.test(val)) {
+        resolve(false)
+      }
       const nameList = subsStore.subs.map(item => item.name);
       nameList.includes(val) && configName !== val
         ? resolve(false)
@@ -491,7 +546,12 @@
   // url 格式验证器
   const urlValidator = (val: string): Promise<boolean> => {
     return new Promise(resolve => {
-      resolve(/^(http|https):\/\/\S+$/.test(val));
+      if (/\n/.test(val)) {
+        resolve(val.split(/[\r\n]+/).map(i => i.trim()).filter(i => i.length).every(i => /^(http|https):\/\/\S+$/.test(i)))
+      } else {
+        resolve(/^(http|https):\/\/\S+$/.test(val));  
+      }
+      
     });
   };
 
@@ -503,7 +563,7 @@
 
 <style lang="scss" scoped>
   .page-wrapper {
-    padding: 0 var(--safe-area-side) calc(v-bind(padding) + 63px)
+    padding: 0 var(--safe-area-side) calc(v-bind('padding') + 63px)
       var(--safe-area-side);
 
     :deep(.nut-cell-group__warp) {
@@ -532,7 +592,8 @@
     justify-content: space-between;
     bottom: 0;
     width: 100%;
-    padding: 12px var(--safe-area-side) v-bind(padding) var(--safe-area-side);
+    padding: 8px var(--safe-area-side) calc(v-bind('padding') + 8px)
+      var(--safe-area-side);
     z-index: 20;
     background: var(--background-color);
     border-top: 1px solid var(--divider-color);
@@ -557,6 +618,18 @@
 
     .submit-btn {
       width: 62%;
+    }
+  }
+
+  .ignore-failed-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+    :deep(.nut-form-item__label) {
+      width: auto;
+    }
+    .swtich-wrapper {
+      display: flex;
+      justify-content: end;
     }
   }
 

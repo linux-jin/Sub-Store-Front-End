@@ -17,13 +17,13 @@ export function useSubsApi() {
     },
     getOne: (type: string, name: string): AxiosPromise<MyAxiosRes> => {
       return request({
-        url: `/api/${type}/${name}`,
+        url: `/api/${type}/${encodeURIComponent(name)}`,
         method: 'get',
       });
     },
     getFlow: (name: string): AxiosPromise<MyAxiosRes> => {
       return request({
-        url: `/api/sub/flow/${name}`,
+        url: `/api/sub/flow/${encodeURIComponent(name)}`,
         method: 'get',
       });
     },
@@ -50,14 +50,14 @@ export function useSubsApi() {
       data: Sub | Collection
     ): AxiosPromise<MyAxiosRes> => {
       return request({
-        url: `/api/${type}/${name}`,
+        url: `/api/${type}/${encodeURIComponent(name)}`,
         method: 'patch',
         data,
       });
     },
     deleteSub: (type: string, name: string): AxiosPromise<MyAxiosRes> => {
       return request({
-        url: `/api/${type}/${name}`,
+        url: `/api/${type}/${encodeURIComponent(name)}`,
         method: 'delete',
       });
     },
@@ -67,6 +67,26 @@ export function useSubsApi() {
     ): AxiosPromise<MyAxiosRes> => {
       return request({
         url: `/api/preview/${type}`,
+        method: 'post',
+        data,
+      });
+    },
+    sortSub: (
+      type: string,
+      data: Sub | Collection | Artifacts
+    ): AxiosPromise<MyAxiosRes> => {
+      return request({
+        url: `/api/${type}`,
+        method: 'put',
+        data,
+      });
+    },
+    newSortSub: (
+      type: string,
+      data: Sub | Collection | Artifacts
+    ): AxiosPromise<MyAxiosRes> => {
+      return request({
+        url: `/api/sort/${type}`,
         method: 'post',
         data,
       });

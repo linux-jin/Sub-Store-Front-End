@@ -5,9 +5,18 @@ interface GlobalStoreState {
   bottomSafeArea: number;
   isDarkMode: boolean;
   env: ENV;
+  isSimpleMode: boolean;
+  isLeftRight: boolean;
+  isIconColor: boolean;
+  isEditorCommon: boolean;
+  isSimpleReicon: boolean;
+  istabBar: boolean;
+  ishostApi: string;
 }
 
 interface ENV {
+  hasNewVersion?: boolean;
+  latestVersion?: string;
   version?: string;
   backend?:
     | 'Stash'
@@ -16,5 +25,7 @@ interface ENV {
     | 'Surge'
     | 'ShadowRocket'
     | 'Clash'
+    | 'ClashMeta'
+    | 'V2Ray'
     | 'Node';
 }

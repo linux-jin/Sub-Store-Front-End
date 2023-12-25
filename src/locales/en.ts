@@ -7,7 +7,7 @@ export default {
   globalNotify: {
     refresh: {
       succeed: 'Refresh Successful!\nEnjoy the feeling',
-      flowFailed: 'Refresh flow of {name} failed！',
+      flowFailed: 'Refresh flow of {name} failed!',
       failed: 'Refresh Failed\n',
       loading: 'Refreshing Data...',
     },
@@ -20,17 +20,28 @@ export default {
       en: 'English',
     },
     pagesTitle: {
-      sub: 'Subscription Management',
+      sub: 'Management',
       sync: 'Sync Subscription',
       my: 'My Profile',
       subEditor: 'Subscription Editor',
       themeSetting: 'Theme Setting',
+      moreSetting: 'More Setting',
+      apiSetting: 'Backend Setting',
+      aboutUs: 'About Sub-Store',
       notFound: '404 Not Found',
       askWhat: {
         sync: {
           title: 'What is Sync Subscription?',
           content:
             'Upload your subscriptions to a private Gist, which can be accessed at any time on devices that do not run the Sub Store (e.g. routers, etc.).',
+        },
+        subEditor: {
+          title: 'Download no subscription?',
+          content: 'Try replacing UA· Download. The default isQuanX UA',
+        },
+        moreSetting: {
+          title: 'Try',
+          content: 'Try',
         },
       },
     },
@@ -45,11 +56,12 @@ export default {
   notFoundPage: {
     title: 'Oops! URL Error!',
     desc: 'Back to Home Page',
+    backendDesc: 'If you are seeing this, it is probably due to a routing interception issue on the front end of your browser. You can force a refresh to see it or use the link directly without affecting the use of this link.',
   },
   // subscription management page
   subPage: {
     addSubTitle: 'Which type you want to create?',
-    previewTitle: 'Which you want to preview?',
+    previewTitle: 'Copy/Preview a subscription',
 
     emptySub: {
       title: 'You have no Subscription yet',
@@ -58,9 +70,12 @@ export default {
     },
     loadFailed: {
       title: 'Load data failed',
-      desc: 'Please check MITM、Rewrite and others in Proxy Tool',
+      desc: 'Please check MITM, Rewrite and others in Proxy Tool',
       btn: 'Retry',
       doc: 'Visit Sub-Store Docs',
+      followOfficialChannel:
+        'You can also follow Sub-Store official channel and join the group to ask questions',
+      officialChannel: 'Official channel:',
     },
     collectionItem: {
       noSub: 'Not contains subscription',
@@ -93,6 +108,9 @@ export default {
       succeed: 'Successfully copied config!',
       failed: 'Failed to copy config!\n{e}',
     },
+    panel: {
+      general: 'General',
+    },
   },
   editorPage: {
     subConfig: {
@@ -105,7 +123,7 @@ export default {
         helpContent:
           'Proxy node actions will be executed in order, and you can drag and drop to sort them.\n\nThe preview switch is used to control whether the action takes effect in the instant preview.\n\nPlease note that node actions will be saved and take effect regardless of whether the preview switch is on or off.',
         helpBtn: 'I Understand',
-        errorTitle: 'Submit Error！',
+        errorTitle: 'Submit Error!',
         errorBtn: 'OK',
         succeedMsg: 'Save Successfully!',
         deleteTitle: 'Delete Confirm',
@@ -136,9 +154,9 @@ export default {
         nodeActionsHelp: 'Node Actions Help',
         name: {
           label: 'Name',
-          placeholder: 'Enter a unique name for the subscription',
+          placeholder: 'Unique name(do not include / )',
           isEmpty: 'Name cannot be empty',
-          isExist: 'The name has been used',
+          isInvalid: 'The name has been used or is invalid',
         },
         displayName: {
           label: 'Display Name',
@@ -148,6 +166,10 @@ export default {
           label: 'Source',
           remote: 'Remote URL',
           local: 'Local',
+          mergeSources: 'Merge Sources',
+          noMerge: 'No Merge',
+          localFirst: 'Local Fist',
+          remoteFirst: 'Remote First',
         },
         url: {
           label: 'URL',
@@ -165,6 +187,9 @@ export default {
         icon: {
           label: 'Icon',
           placeholder: 'The URL of the icon',
+        },
+        ignoreFailedRemoteSub: {
+          label: 'Ignore failed remote subscription(s)'
         },
         ua: {
           label: 'User-Agent',
@@ -239,7 +264,7 @@ export default {
         'Resolve Domain Operator': {
           label: 'Resolve Domain',
           des: 'Providers',
-          options: ['Google', 'IP-API', 'Cloudflare'],
+          options: ['Google', 'IP-API', 'Cloudflare', 'Ali', 'Tencent'],
           tipsTitle: 'domain Tips',
           tipsDes: '节点域名解析操作说明',
         },
@@ -260,6 +285,10 @@ export default {
             'Http(s)',
             'Socks5',
             'Snell',
+            'TUIC',
+            'Hysteria',
+            'Hysteria2',
+            'WireGuard',
           ],
           tipsTitle: 'Node Type Filter Tips',
           tipsDes: '节点类型过滤器操作说明',
@@ -335,10 +364,12 @@ export default {
       des: 'Sync available after Gist configuration',
       uploadTime: 'Last upload time',
       haveNotDownload: 'Not download yet',
-      githubUser: 'Please input Github username',
+      githubUser: 'Please input GitHub username',
       gistToken: 'Please input Gist Token',
-      noGithubUser: 'Not set Github username',
+      defaultUserAgent: 'Please input Default User-Agent',
+      noGithubUser: 'Not set GitHub username',
       noGistToken: 'Not set Gist Token',
+      noDefaultUserAgent: 'Not set default user-agent'
     },
     btn: {
       download: 'Download',
@@ -346,11 +377,16 @@ export default {
       cancel: 'Cancel',
       edit: 'Edit',
       save: 'Save',
+      clear: 'Clear',
     },
     notify: {
       save: {
         succeed: 'Save succeed',
         failed: 'Save failed',
+      },
+      restore: {
+        succeed: 'Restore succeed',
+        failed: 'Restore failed',
       },
       download: {
         succeed: 'Download succeed',
@@ -360,8 +396,22 @@ export default {
         succeed: 'Upload succeed',
         failed: 'Upload failed',
       },
+      sortsub: {
+        failed: 'Sort failed',
+      }
     },
-    config: 'Gist Configuration',
+    config: 'Configuration',
+    storage: {
+      gist: {
+        label: 'Gist'
+      },
+      manual: {
+        label: 'Manual',
+        desc: 'To prevent accidents, backup your data before restoring.',
+        backup: 'Backup',
+        restore: 'Restore',
+      }
+    }
   },
   comparePage: {
     title: 'Instant Preview',
@@ -467,7 +517,7 @@ export default {
     },
   },
   themeSettingPage: {
-    themeSettingTitle: 'Theme Setting',
+    themeSettingTitle: 'Appearance',
     auto: 'Auto Switch',
     light: 'Light Mode',
     dark: 'Dark Mode',
@@ -475,6 +525,66 @@ export default {
       title: 'Pick a Theme',
       cancel: 'Cancel',
       confirm: 'Confirm',
+    },
+  },
+  apiSettingPage: {
+    apiSettingTitle: 'Backend Setting',
+    apiSettingDesc0: `1. When the backend server address is https://api.com, an attempt is made to request https://api.com/api/utils/env to verify backend availability. When the backend server address cannot be added, try accessing this address first.`,
+    apiSettingDesc1: `2. HTTPS front-end cannot request non-local HTTP backend. Please configure a reverse proxy or host your own HTTP front-end on your LAN.`,
+    apiSettingDesc2: `Add the backend server address, such as the backend service built on server/NAS/Android/cloud platform. You can refer to XiaoYi's tutorial on setting up a backend: `,
+    currentApi: {
+      title: 'Current Backend',
+    },
+    apiList: {
+      title: 'Backend List',
+      desc: 'This list is saved locally in the browser. If you change your browser/device, you will need to add it again. Click to switch to the corresponding backend.',
+      defaultName: 'Default',
+      currentTag: 'Current',
+    },
+    addApi: {
+      title: 'Add New Backend',
+      placeholder: {
+        name: 'Please input backend name, must be unique',
+        url: 'Please input backend url',
+      },
+      btn: 'Add',
+    },
+  },
+  moreSettingPage: {
+    moreSettingTitle: 'More Setting',
+    other: 'Other',
+    auto: 'Auto Download Gist config on startup',
+    desc: 'Note: Turning on this switch will automatically download and refresh the Gist remote configuration when SubStore is opened. The refresh operation overwrites the current configuration. To prevent data loss, you can manually upload the configuration after the modification. The switch will not be uploaded, and the configuration will be downloaded only after the restart.',
+    simple: 'Simple Mode',
+    islr: 'Card right swipe to call out',
+    isIC: 'Use original color for icons',
+    isEditorCommon: 'Show editor common settings',
+    isSimpleReicon: 'Show items refresh button',
+    tabBar: 'Hide "Sync" Page',
+    auto2: 'MoreSetting Key',
+    hostapi: 'Custom Backend API',
+    currentHostApi: 'Current Backend API',
+    yhostapi: 'Default:https://sub.store ',
+    serverDesc:
+      'Configure the back-end server address, such as the back-end service set up on VPS or Render. After the configuration, restart the Sub Store to take effect. To delete the api, use the original default backend to manually delete the address and click Save',
+    InputHostApi: {
+      title: 'Link validation failed invalid link',
+      content:
+        'Mainstream browsers have already blocked HTTP requests on HTTPS pages. Please use the HTTPS protocol instead',
+    },
+  },
+  aboutUsPage: {
+    projectInfo: {
+      title: 'Project Info (Please Star 🌟)',
+      fe: 'Front-End',
+      be: 'Back-End',
+      module: 'Module',
+      mock: 'Mock Module',
+      team: 'Project Team',
+      link: 'View on Github',
+    },
+    changelogs: {
+      title: 'Changelogs',
     },
   },
 };

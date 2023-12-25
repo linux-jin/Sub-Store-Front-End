@@ -1,30 +1,78 @@
 <template>
-  <nut-swipe class="sub-item-swipe" ref="swipe">
-    <div class="sub-item-wrapper" @click="compareSub">
-      <div class="sub-img-wrapper">
-        <nut-avatar
-          class="sub-item-customer-icon"
-          size="48"
-          :url="props[props.type].icon || icon"
-          bg-color=""
-        ></nut-avatar>
+  <!-- 滚动内容 -->
+  <nut-swipe class="sub-item-swipe" ref="swipe" :disabled="props.disabled">
+    <div
+      class="sub-item-wrapper"
+      :style="{ padding: isSimpleMode ? '9px' : '16px' }"
+      @click="onClickPreview"
+    >
+      <!-- compareSub -->
+      <div
+        @click.stop="compareSub"
+        class="sub-img-wrappers"
+        :style="{ 'margin-top': isSimpleMode ? '5px' : '0' }"
+      >
+        <div v-if="isIconColor">
+          <nut-avatar
+            v-if="props[props.type].icon"
+            :size="isSimpleMode ? '36' : '48'"
+            :url="props[props.type].icon"
+            bg-color=""
+          />
+          <nut-avatar
+            v-else
+            class="sub-item-customer-icon"
+            :size="isSimpleMode ? '36' : '48'"
+            :url="icon"
+            bg-color=""
+          />
+        </div>
+        <div v-else>
+          <nut-avatar
+            class="sub-item-customer-icon"
+            :size="isSimpleMode ? '36' : '48'"
+            :url="props[props.type].icon || icon"
+            bg-color=""
+          />
+        </div>
       </div>
       <div class="sub-item-content">
         <div class="sub-item-title-wrapper">
-          <h3 class="sub-item-title">
+          <h3 v-if="!isSimpleMode" class="sub-item-title">
             {{ displayName || name }}
           </h3>
-          <div>
+          <h3 v-else style="color: var(--primary-text-color); font-size: 16px">
+            {{ displayName || name }}
+          </h3>
+
+          <!-- onClickCopyLink 拷贝 -->
+          <div
+            style="position: relative"
+            :style="{ top: isSimpleMode ? '8px' : '0' }"
+          >
             <button class="copy-sub-link" @click.stop="onClickCopyLink">
-              <font-awesome-icon icon="fa-solid fa-clone"></font-awesome-icon>
+              <font-awesome-icon icon="fa-solid fa-clone" />
             </button>
             <button
               class="refresh-sub-flow"
               @click.stop="onClickRefresh"
-              v-if="props.type === 'sub'"
+              v-if="props.type === 'sub' && (!isSimpleMode || isSimpleReicon)"
             >
               <font-awesome-icon icon="fa-solid fa-arrow-rotate-right" />
             </button>
+
+            <!-- 编辑 -->
+            <button
+              v-if="!isSimpleMode"
+              class="copy-sub-link"
+              @click.stop="onClickEdit"
+            >
+              <font-awesome-icon icon="fa-solid fa-pen-nib" />
+            </button>
+            <button class="refresh-sub-flow" @click.stop="onClickEdit" v-else>
+              <font-awesome-icon icon="fa-solid fa-pen-nib" />
+            </button>
+
             <button
               class="copy-sub-link"
               @click.stop="swipeController"
@@ -35,26 +83,48 @@
             </button>
           </div>
         </div>
+        <template v-if="!isSimpleMode">
+          <p v-if="type === 'sub'" class="sub-item-detail">
+            <template v-if="typeof flow === 'string'">
+              <span>
+                {{ flow }}
+              </span>
+            </template>
+            <template v-else>
+              <span>
+                {{ flow.firstLine }}
+              </span>
+              <span> {{ flow.secondLine }} </span>
+            </template>
+          </p>
+          <p v-else-if="type === 'collection'" class="sub-item-detail">
+            {{ collectionDetail }}
+          </p>
+        </template>
 
-        <p v-if="type === 'sub'" class="sub-item-detail">
-          <template v-if="typeof flow === 'string'">
-            <span>
-              {{ flow }}
-            </span>
-          </template>
-          <template v-else>
-            <span>
-              {{ flow.firstLine }}
-            </span>
-            <span> {{ flow.secondLine }} </span>
-          </template>
-        </p>
-        <p v-else-if="type === 'collection'" class="sub-item-detail">
-          {{ collectionDetail }}
-        </p>
+        <template v-else>
+          <p v-if="type === 'sub'" class="sub-item-detail-isSimple">
+            <template v-if="typeof flow === 'string'">
+              <span style="font-weight: normal">
+                {{ flow }}
+              </span>
+            </template>
+            <template v-else>
+              <span style="font-weight: normal">
+                {{ flow.firstLine }} &nbsp;
+              </span>
+              <span style="font-weight: normal"> {{ flow.secondLine }} </span>
+            </template>
+          </p>
+          <p v-else-if="type === 'collection'" class="sub-item-detail-isSimple">
+            {{ collectionDetail }}
+          </p>
+        </template>
       </div>
     </div>
-    <template #left>
+    <!-- 加入判断 开启拖动不显示 -->
+    <template v-if="isLeftRight" #left>
+      <!-- Copy -->
       <div class="sub-item-swipe-btn-wrapper">
         <nut-button
           shape="square"
@@ -65,28 +135,41 @@
           <font-awesome-icon icon="fa-solid fa-paste" />
         </nut-button>
       </div>
-    </template>
-    <template #right>
-      <div class="sub-item-swipe-btn-wrapper">
-        <nut-button
-          shape="square"
-          type="success"
-          class="sub-item-swipe-btn"
-          @click="onClickPreview"
-        >
+      <!-- preview -->
+      <!-- <div class="sub-item-swipe-btn-wrapper">
+        <nut-button shape="square" type="success" class="sub-item-swipe-btn" @click="onClickPreview">
           <font-awesome-icon icon="fa-solid fa-eye" />
         </nut-button>
-      </div>
+      </div> -->
+      <!-- del -->
       <div class="sub-item-swipe-btn-wrapper">
         <nut-button
           shape="square"
-          type="warning"
+          type="danger"
           class="sub-item-swipe-btn"
-          @click="onClickEdit"
+          @click="onClickDelete"
         >
-          <font-awesome-icon icon="fa-solid fa-pen-nib" />
+          <font-awesome-icon icon="fa-solid fa-trash-can" />
         </nut-button>
       </div>
+    </template>
+
+    <template v-else #right>
+      <div class="sub-item-swipe-btn-wrapper">
+        <nut-button
+          shape="square"
+          type="primary"
+          class="sub-item-swipe-btn"
+          @click="onClickCopyConfig"
+        >
+          <font-awesome-icon icon="fa-solid fa-paste" />
+        </nut-button>
+      </div>
+      <!-- <div class="sub-item-swipe-btn-wrapper">
+        <nut-button shape="square" type="success" class="sub-item-swipe-btn" @click="onClickPreview">
+          <font-awesome-icon icon="fa-solid fa-eye" />
+        </nut-button>
+      </div> -->
       <div class="sub-item-swipe-btn-wrapper">
         <nut-button
           shape="square"
@@ -99,6 +182,7 @@
       </div>
     </template>
   </nut-swipe>
+
   <CompareTable
     v-if="compareTableIsVisible"
     :name="name"
@@ -126,16 +210,21 @@
   import useV3Clipboard from 'vue-clipboard3';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
+  import { useHostAPI } from '@/hooks/useHostAPI';
 
   const { copy, isSupported } = useClipboard();
   const { toClipboard: copyFallback } = useV3Clipboard();
+
   const { t } = useI18n();
 
   const props = defineProps<{
     type: 'sub' | 'collection';
     sub?: Sub;
     collection?: Collection;
+    disabled?: boolean;
   }>();
+  // console.log('props.disabled')
+  // console.log(props.disabled)
   const compareTableIsVisible = ref(false);
   usePopupRoute(compareTableIsVisible);
 
@@ -147,6 +236,14 @@
   const globalStore = useGlobalStore();
   const subsStore = useSubsStore();
   const subsApi = useSubsApi();
+  const {
+    isFlowFetching,
+    isSimpleMode,
+    isLeftRight,
+    isIconColor,
+    isSimpleReicon,
+  } = storeToRefs(globalStore);
+
   const displayName =
     props[props.type].displayName || props[props.type]['display-name'];
 
@@ -166,7 +263,6 @@
       )}`;
     }
   });
-  const { isFlowFetching } = storeToRefs(globalStore);
 
   const flow = computed(() => {
     if (props.type === 'sub') {
@@ -190,20 +286,30 @@
           usage: { upload, download },
         } = target.data;
 
-        const secondLine = !expires
-          ? t('subPage.subItem.noExpiresInfo')
-          : `${t('subPage.subItem.expires')}：${dayjs
-              .unix(expires)
-              .format('YYYY-MM-DD')}`;
-
-        return {
-          firstLine: `${t('subPage.subItem.flow')}：${getString(
-            upload + download,
-            total,
-            'B'
-          )}`,
-          secondLine,
-        };
+        let secondLine: string;
+        if (isSimpleMode.value) {
+          secondLine = !expires
+            ? ''
+            : `${dayjs.unix(expires).format('YYYY-MM-DD')}`;
+          return {
+            firstLine: `${getString(upload + download, total, 'B')}`,
+            secondLine,
+          };
+        } else {
+          secondLine = !expires
+            ? t('subPage.subItem.noExpiresInfo')
+            : `${t('subPage.subItem.expires')}：${dayjs
+                .unix(expires)
+                .format('YYYY-MM-DD')}`;
+          return {
+            firstLine: `${t('subPage.subItem.flow')}：${getString(
+              upload + download,
+              total,
+              'B'
+            )}`,
+            secondLine,
+          };
+        }
       } else if (target?.status === 'failed') {
         if (target.error.code === 'NO_FLOW_INFO') {
           return {
@@ -226,27 +332,33 @@
   };
 
   const compareSub = async () => {
-    Toast.loading('生成节点对比中...', { id: 'compare', cover: true });
+    Toast.loading('生成节点对比中...', { id: 'compare', cover: true, duration: 1500 });
     const res = await useSubsApi().compareSub(
       props.type,
       props.sub ?? props.collection
     );
-    if (res.data.status === 'success') {
+    if (res?.data?.status === 'success') {
       compareData.value = res.data.data;
       compareTableIsVisible.value = true;
       Toast.hide('compare');
     }
   };
-
+  const swipeClose = () => {
+    swipe.value.close();
+  };
   const swipeController = () => {
     if (swipeIsOpen.value) {
       swipe.value.close();
       swipeIsOpen.value = false;
       moreAction.value.style.transform = 'rotate(0deg)';
     } else {
-      swipe.value.open('left');
-      swipeIsOpen.value = true;
-      moreAction.value.style.transform = 'rotate(180deg)';
+      if (isLeftRight.value) {
+        swipe.value.open('right');
+      } else {
+        swipe.value.open('left');
+        swipeIsOpen.value = true;
+        moreAction.value.style.transform = 'rotate(180deg)';
+      }
     }
   };
 
@@ -258,7 +370,12 @@
   const onClickPreview = () => {
     Dialog({
       title: t('subPage.previewTitle'),
-      content: createVNode(PreviewPanel, { name, type: props.type }),
+      content: createVNode(PreviewPanel, {
+        name,
+        type: props.type,
+        general: t('subPage.panel.general'),
+        notify: t('subPage.copyNotify.succeed'),
+      }),
       onOpened: () => swipe.value.close(),
       popClass: 'auto-dialog',
       // @ts-ignore-next-line  组件库bug，类型错误但功能正常
@@ -271,7 +388,7 @@
   };
 
   const onClickCopyConfig = async () => {
-    let data;
+    let data: Sub | Collection;
     switch (props.type) {
       case 'sub':
         data = JSON.parse(JSON.stringify(toRaw(props.sub)));
@@ -291,7 +408,7 @@
   };
 
   const onClickEdit = () => {
-    router.push(`/edit/${props.type}s/${name}`);
+    router.push(`/edit/${props.type}s/${encodeURIComponent(name)}`);
   };
 
   const onClickDelete = () => {
@@ -314,20 +431,21 @@
   };
 
   const { showNotify } = useAppNotifyStore();
+  const { currentUrl: host } = useHostAPI();
 
   const onClickCopyLink = async () => {
-    const host = import.meta.env.VITE_API_URL;
-    const url = `${host}/download/${
+    const url = `${host.value}/download/${
       props.type === 'collection' ? 'collection/' : ''
-    }${name}`;
+    }${encodeURIComponent(name)}`;
 
     if (isSupported) {
-      await copy(encodeURI(url));
+      await copy(url);
     } else {
-      await copyFallback(encodeURI(url));
+      await copyFallback(url);
     }
-    showNotify({ title: t('subPage.copyNotify.succeed'), type: 'success' });
+    showNotify({ title: t('subPage.copyNotify.succeed') });
   };
+
   const onClickRefresh = async () => {
     Toast.loading(t('globalNotify.refresh.loading'), {
       cover: true,
@@ -343,17 +461,17 @@
   .sub-item-customer-icon {
     :deep(img) {
       & {
+        opacity: 0.8;
         filter: brightness(var(--img-brightness));
       }
     }
   }
 
   .sub-item-wrapper {
-    width: calc(100% - 24px);
+    line-height: 1.4;
     margin-left: auto;
     margin-right: auto;
     border-radius: var(--item-card-radios);
-    padding: var(--safe-area-side);
     display: flex;
     background: var(--card-color);
 
@@ -372,6 +490,7 @@
 
     > .sub-item-content {
       flex: 1;
+      line-height: 1.6;
 
       .sub-item-title-wrapper {
         display: flex;
@@ -405,6 +524,15 @@
             color: var(--lowest-text-color);
           }
         }
+
+        button {
+          white-space: nowrap;
+        }
+
+        div {
+          display: flex;
+          align-items: center;
+        }
       }
 
       .sub-item-detail {
@@ -423,6 +551,19 @@
           line-height: 1.8;
         }
       }
+
+      .sub-item-detail-isSimple {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        word-wrap: break-word;
+        word-break: break-all;
+        overflow: hidden;
+        font-size: 12px;
+        // margin-top: 3.5px;
+        max-width: 80%;
+        color: var(--comment-text-color);
+      }
     }
   }
 
@@ -440,18 +581,49 @@
       align-items: center;
 
       .sub-item-swipe-btn-wrapper {
-        padding-left: 24px;
+        padding-left: 14px;
 
         &:last-child {
-          padding-right: 12px;
+          padding-right: 14px;
         }
 
         .sub-item-swipe-btn {
           border-radius: 50%;
-          height: 48px;
-          width: 48px;
+          height: 46px;
+          width: 44px;
         }
       }
     }
+  }
+
+  .desc-about {
+    display: block;
+    padding: 100px 30px 350px;
+    color: var(--comment-text-color);
+    font-size: 12px;
+    line-height: 20px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .desc-about span {
+    display: inline-block;
+    padding: 6px 0 0 0;
+  }
+
+  .desc-title a,
+  .desc-about a {
+    color: var(--primary-color);
+  }
+
+  .subs-list-wrapper {
+    margin-bottom: 36px;
+    position: relative;
+  }
+
+  .sub-img-wrappers {
+    display: flex;
+    align-items: center;
   }
 </style>
