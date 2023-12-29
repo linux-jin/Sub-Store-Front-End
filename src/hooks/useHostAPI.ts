@@ -16,6 +16,10 @@ const getHostAPI = (): HostAPIStorage => {
 				current: '',
 				apis: [
 					{
+						name: '在线后端',
+						url: import.meta.env.VITE_API_URL
+					},
+					{
 						name: '本地后端',
 						url: 'https://sub.store'
 					}
