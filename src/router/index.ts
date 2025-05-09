@@ -3,6 +3,7 @@ import { useEnvApi } from '@/api/env';
 import { useSubsApi } from '@/api/subs';
 import { useFilesApi } from '@/api/files';
 
+import Login from '@/views/Login.vue';
 import AppLayout from '@/layout/AppLayout.vue';
 import { useGlobalStore } from '@/store/global';
 import { initStores } from '@/utils/initApp';
@@ -77,7 +78,7 @@ const router = createRouter({
   history,
   routes: [
     {
-      path: '/',
+      path: '/sub',
       component: AppLayout,
       redirect: '/subs',
       children: [
@@ -227,6 +228,15 @@ const router = createRouter({
         needNavBack: true,
       },
     },
+    {
+      path: '/',
+      component: Login,
+      meta: {
+        title: 'login',
+        needTabBar: false,
+        needNavBack: false,
+      },
+    },
   ],
 });
 
@@ -341,6 +351,26 @@ router.beforeResolve(async (to, from) => {
   // }
   // 允许跳转
   return true;
+});
+
+router.beforeEach((to, from, next) => {
+	// let token = window.localStorage.getItem('token')
+	// let type = window.localStorage.getItem('type')
+	if (to.path === '/' || to.path === '/login' || to.path === '/error') {
+		// console.log("允许直接访问")
+		next()
+	} else {
+		// let token = window.localStorage.getItem('token') // 长期存储
+		let token = window.sessionStorage.getItem('token') // 临时存储，关闭标签后就清除
+		// console.log("需要token")
+		if (token === null || token === '' || token !== import.meta.env.VITE_TOKEN) {
+			// console.log("无token，跳转登录")
+			next('/')
+		} else {
+			// console.log("有token")
+			next()
+		}
+	}
 });
 
 export default router;
