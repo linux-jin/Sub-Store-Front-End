@@ -59,6 +59,7 @@ export default {
       en: 'English',
     },
     pagesTitle: {
+      login: '登录',
       sub: '订阅管理',
       file: '文件管理',
       sync: '同步',

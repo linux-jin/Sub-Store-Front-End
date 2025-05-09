@@ -31,6 +31,7 @@ export default {
       en: "English",
     },
     pagesTitle: {
+      login: 'Login',
       sub: "Management",
       file: "File",
       sync: "Sync",
