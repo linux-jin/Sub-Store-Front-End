@@ -1,6 +1,6 @@
 <template>
   <div class='wrapper'>
-    <div>欢迎使用</div>
+    <div class="title">欢迎使用</div>
     <nut-form
       :model-value='formData'
       ref='ruleForm'
@@ -137,13 +137,16 @@ export default {
 
 <style lang='scss' scoped>
 .wrapper {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-
+  .title {
+    font-size: 30px;
+    font-weight: bold;
+  }
   h3 {
     padding-bottom: 24px;
   }
