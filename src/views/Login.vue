@@ -1,7 +1,7 @@
 <template>
   <div class='wrapper'>
-    <div class="title">欢迎使用</div>
     <nut-form
+      class="form"
       :model-value='formData'
       ref='ruleForm'
     >
@@ -143,9 +143,8 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  .title {
-    font-size: 30px;
-    font-weight: bold;
+  .form {
+    max-width: 80%;
   }
   h3 {
     padding-bottom: 24px;
