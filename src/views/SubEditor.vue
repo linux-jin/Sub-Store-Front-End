@@ -1044,7 +1044,7 @@ const submit = () => {
     }
 
     if (res?.data?.status === 'success') {
-      router.replace('/sub').then(() => {
+      router.replace('/').then(() => {
         if (res)
           showNotify({
             type: 'success',

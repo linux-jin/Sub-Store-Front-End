@@ -79,8 +79,8 @@ export default {
               })
               sessionStorage.setItem('token', import.meta.env.VITE_TOKEN) // 临时存储，关闭标签后就清除
               setTimeout(() => {
-                router.push({ path: '/sub' })
-                // router.replace('/sub')
+                router.push({ path: '/' })
+                // router.replace('/')
                 Toast.hide()
               }, 1200)
             } else {

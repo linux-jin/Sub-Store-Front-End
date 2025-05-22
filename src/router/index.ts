@@ -78,7 +78,7 @@ const router = createRouter({
   history,
   routes: [
     {
-      path: '/sub',
+      path: '/',
       component: AppLayout,
       redirect: '/subs',
       children: [
@@ -229,7 +229,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/',
+      path: '/login',
       component: Login,
       meta: {
         title: 'login',
@@ -356,7 +356,7 @@ router.beforeResolve(async (to, from) => {
 router.beforeEach((to, from, next) => {
 	// let token = window.localStorage.getItem('token')
 	// let type = window.localStorage.getItem('type')
-	if (to.path === '/' || to.path === '/login' || to.path === '/error') {
+	if (to.path === '/login' || to.path === '/error') {
 		// console.log("允许直接访问")
 		next()
 	} else {
@@ -365,7 +365,7 @@ router.beforeEach((to, from, next) => {
 		// console.log("需要token")
 		if (token === null || token === '' || token !== import.meta.env.VITE_TOKEN) {
 			// console.log("无token，跳转登录")
-			next('/')
+			next('/login')
 		} else {
 			// console.log("有token")
 			next()
